@@ -25,9 +25,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'sku', 'created_date', 'updated_date', 'category', 'images', 'tags']
+        fields = ['id', 'name', 'description', 'sku', 'created_date', 'updated_date', 'category', 'images', 'tags', 'supplier']
+        read_only_fields = ('supplier',)
 
 class ProductCreateUpdateSerializer(serializers.ModelSerializer):
+    supplier = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Product
-        fields = ['name', 'description', 'sku', 'status', 'category']
+        fields = ['name', 'description', 'sku', 'status', 'category', 'supplier']

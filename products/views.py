@@ -1,49 +1,35 @@
-from rest_framework import generics, mixins
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from .models import Category, Product, ProductImage, ProductTag
 from .serializers import CategorySerializer, ProductCreateUpdateSerializer, ProductImageSerializer, ProductSerializer, ProductTagSerializer
-from ecommerce_all.permissions import IsSupplierOrReadOnly
+from ecommerce_all.permissions import IsSupplierOrReadOnly, IsSupplierOwnerOrReadOnly
 
 # Create your views here.
 
-class CategoryListCreateView (mixins.ListModelMixin,
-                              mixins.CreateModelMixin,
-                              generics.GenericAPIView):
+class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
-    
-    def get (self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-    
-    def post (self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
 
-class ProductListCreateView (mixins.ListModelMixin,
-                             mixins.CreateModelMixin,
-                             generics.GenericAPIView):
-    
+class ProductListCreateView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return ProductCreateUpdateSerializer
         return ProductSerializer
-    
+
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
-    
-    def get (self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-    
-    def post (self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
+
+    def perform_create(self, serializer):
+        serializer.save(supplier=self.request.user.profile)
 
 class ProductDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
@@ -52,54 +38,38 @@ class ProductDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PUT', 'PATCH']:
             return ProductCreateUpdateSerializer
         return ProductSerializer
-    
+
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOwnerOrReadOnly()]
 
-class ProductImageListCreateView(mixins.ListModelMixin,
-                                 mixins.CreateModelMixin,
-                                 generics.GenericAPIView):
+class ProductImageListCreateView(generics.ListCreateAPIView):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-    
-class ProductImageDetailUpdateDeleteView (generics.RetrieveUpdateDestroyAPIView):
+class ProductImageDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
 
-class ProductTagListCreateView(mixins.ListModelMixin,
-                               mixins.CreateModelMixin,
-                               generics.GenericAPIView):
+class ProductTagListCreateView(generics.ListCreateAPIView):
     queryset = ProductTag.objects.all()
     serializer_class = ProductTagSerializer
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
 
 class ProductTagDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ProductTag.objects.all()
@@ -107,5 +77,5 @@ class ProductTagDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated(), IsSupplierOrReadOnly()]
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), IsSupplierOrReadOnly()]
