@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'djoser',
     'profiles',
     'products',
+    'inventory',
 
 ]
 

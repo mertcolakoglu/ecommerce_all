@@ -18,6 +18,12 @@ class IsSupplierOwnerOrReadOnly(permissions.BasePermission):
             return True
         return request.user.is_authenticated and request.user.profile.is_supplier and obj.supplier == request.user.profile
 
+class IsSupplierOwnerOfProductOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user.is_authenticated and request.user.profile.is_supplier and obj.product.supplier == request.user.profile
+
 class CanManageCart(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated
