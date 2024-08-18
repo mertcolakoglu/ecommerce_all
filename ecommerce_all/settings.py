@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'profiles',
     'products',
     'inventory',
+    'pricing',
 
 ]
 
